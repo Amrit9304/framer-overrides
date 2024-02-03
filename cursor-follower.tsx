@@ -120,8 +120,10 @@ export function withCursorFollow(Component: ComponentType): ComponentType {
                     top: positionY,
                     pointerEvents: "none",
                     zIndex: 9999,
-                    transform: `scale(${isClicked ? 0.5 : 1})`,
-                    transition: `transform 0.3s ease-out`,
+                    transform: `translate(-50%, -50%) scale(${
+                        isClicked ? 1.5 : 1
+                    })`, // Adjusted transform to include translation
+                    transition: `transform 0.1s ease-out`,
                 }}
             >
                 <Component {...props} />
