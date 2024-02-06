@@ -23,34 +23,19 @@ export function withCursorFollow(Component: ComponentType): ComponentType {
         const cursorStyle = document.createElement("style")
         cursorStyle.appendChild(
             document.createTextNode(
-                `.custom-cursor { cursor: none !important; }`
+                `.custom-cursor { cursor: none !important; transition: transform 0.3s ease-in-out; }`
             )
         )
         document.head.appendChild(cursorStyle)
 
         const cursorRef = useRef(null)
         const [isHovering, setIsHovering] = useState(false)
+        const [isClicked, setIsClicked] = useState(false)
 
         const spring = {
             type: "spring",
             stiffness: 1000,
             damping: 70,
-        }
-
-        const clickSpring = {
-            type: "spring",
-            stiffness: 500,
-            damping: 30,
-        }
-
-        const [isClicked, setIsClicked] = useState(false)
-
-        const handleClick = () => {
-            setIsClicked(true)
-
-            setTimeout(() => {
-                setIsClicked(false)
-            }, 100)
         }
 
         const storedPosition = localStorage.getItem("cursorPosition")
@@ -60,14 +45,8 @@ export function withCursorFollow(Component: ComponentType): ComponentType {
                 : { x: window.innerWidth / 2, y: window.innerHeight / 2 }
         )
 
-        const positionX = useSpring(
-            initialCursorPosition.current.x,
-            isClicked ? clickSpring : spring
-        )
-        const positionY = useSpring(
-            initialCursorPosition.current.y,
-            isClicked ? clickSpring : spring
-        )
+        const positionX = useSpring(initialCursorPosition.current.x, spring)
+        const positionY = useSpring(initialCursorPosition.current.y, spring)
 
         useEffect(() => {
             const handleMouseMove = (e: MouseEvent) => {
@@ -89,31 +68,29 @@ export function withCursorFollow(Component: ComponentType): ComponentType {
                 )
             }
 
+            const handleClick = () => {
+                setIsClicked(true)
+
+                setTimeout(() => {
+                    setIsClicked(false)
+                }, 100)
+            }
+
             initialCursorPosition.current.x = window.innerWidth / 2
             initialCursorPosition.current.y = window.innerHeight / 2
 
             window.addEventListener("mousemove", handleMouseMove)
+            window.addEventListener("click", handleClick)
+
             return () => {
                 window.removeEventListener("mousemove", handleMouseMove)
-            }
-        }, [isClicked])
-
-        useEffect(() => {
-            const handleMouseClick = () => {
-                handleClick()
-            }
-
-            window.addEventListener("click", handleMouseClick)
-
-            return () => {
-                window.removeEventListener("click", handleMouseClick)
+                window.removeEventListener("click", handleClick)
             }
         }, [])
 
         return (
             <motion.div
                 ref={cursorRef}
-                className={`custom-cursor ${isHovering ? "hovered" : ""}`}
                 style={{
                     position: "fixed",
                     left: positionX,
@@ -122,9 +99,10 @@ export function withCursorFollow(Component: ComponentType): ComponentType {
                     zIndex: 9999,
                     transform: `translate(-50%, -50%) scale(${
                         isClicked ? 0.6 : 1
-                    })`, // Adjusted transform to include translation
+                    })`,
                     transition: `transform 0.1s ease-out`,
                 }}
+                className={isHovering ? "custom-cursor hover" : "custom-cursor"}
             >
                 <Component {...props} />
             </motion.div>
