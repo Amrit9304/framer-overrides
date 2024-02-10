@@ -3,7 +3,7 @@ import type { ComponentType, HTMLAttributes } from "react"
 
 interface BackgroundBlur {}
 
-export function OnHover<T extends HTMLAttributes<HTMLElement>>(
+export function applyBackgroundBlur<T extends HTMLAttributes<HTMLElement>>(
     Component: ComponentType<T>
 ): ComponentType<T & BackgroundBlur> {
     return (props) => {
