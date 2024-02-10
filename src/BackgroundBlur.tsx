@@ -1,11 +1,11 @@
 import React, { useRef } from "react"
 import type { ComponentType, HTMLAttributes } from "react"
 
-interface OnHoverProps {}
+interface BackgroundBlur {}
 
 export function OnHover<T extends HTMLAttributes<HTMLElement>>(
     Component: ComponentType<T>
-): ComponentType<T & OnHoverProps> {
+): ComponentType<T & BackgroundBlur> {
     return (props) => {
         const ref = useRef(null)
 
